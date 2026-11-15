@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusAI — Yeni Nesil Kişisel Yapay Zeka Asistanı</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        james: {
+                            bg: '#0B0F19',
+                            sidebar: '#0F1524',
+                            surface: '#151D30',
+                            card: '#1B253D',
+                            border: '#263352',
+                            cyan: '#38BDF8',
+                            blue: '#60A5FA',
+                            violet: '#A78BFA',
+                            pink: '#F472B6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Marked.js for Crisp Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0F19;
+            color: #F1F5F9;
+        }
+        h1, h2, h3, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .james-gradient-text {
+            background: linear-gradient(90deg, #38BDF8 0%, #818CF8 45%, #F472B6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .james-gradient-bg {
+            background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 50%, #EC4899 100%);
+        }
+        .aurora-glow {
+            box-shadow: 0 0 35px -8px rgba(56, 189, 248, 0.25), 0 0 25px -10px rgba(167, 139, 250, 0.25);
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #263352; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B4E7A; }
+
+        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.65; }
+        .markdown-body p:last-child { margin-bottom: 0; }
+        .markdown-body ul, .markdown-body ol { margin-left: 1.25rem; margin-bottom: 0.75rem; list-style-type: disc; }
+        .markdown-body ol { list-style-type: decimal; }
+        .markdown-body li { margin-bottom: 0.35rem; }
+        .markdown-body strong { color: #FFFFFF; font-weight: 600; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-body h2 { font-size: 1.15rem; }
+        .markdown-body h3 { font-size: 1.02rem; }
+        .markdown-body code:not(pre code) {
+            background: rgba(56, 189, 248, 0.14);
+            color: #7DD3FC;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.375rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84em;
+        }
+        .markdown-body pre {
+            background: #070A12;
+            border: 1px solid #263352;
+            border-radius: 0.85rem;
+            padding: 0.9rem 1rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            position: relative;
+        }
+        .markdown-body pre code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.83rem;
+            color: #E2E8F0;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-canvas {
+            background: linear-gradient(90deg, #151D30 25%, #233050 50%, #151D30 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.8s infinite linear;
+        }
+        @keyframes sparkleSpin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.18) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+        .animate-sparkle {
+            animation: sparkleSpin 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex bg-james-bg text-slate-100 select-none sm:select-auto">
+
+    <!-- GİRİŞ VE KAYIT EKRANI -->
+    <div id="auth-gate-modal" class="fixed inset-0 z-50 bg-james-bg/95 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-james-sidebar border border-james-border rounded-3xl p-8 shadow-2xl text-center space-y-6 aurora-glow">
+            <div class="w-16 h-16 rounded-2xl james-gradient-bg mx-auto flex items-center justify-center shadow-lg shadow-sky-500/25 animate-sparkle">
+                <!-- Özel NexusAI Logosu -->
+                <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            </div>
+            
+            <div class="space-y-2">
+                <h1 id="auth-title" class="text-2xl font-display font-extrabold text-white">NexusAI'ye Giriş Yap</h1>
+                <p id="auth-desc" class="text-xs text-slate-400 leading-relaxed">
+                    Bulut senkronizasyonu ile her cihazdan verilerinize erişmek için giriş yapın.
+                </p>
+            </div>
+
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4 text-left">
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-bold text-slate-300 px-1">Kullanıcı Adı</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-3.5 top-3 w-4 h-4 text-slate-500"></i>
+                        <input type="text" id="auth-username" placeholder="Kullanıcı adınız..." required class="w-full bg-james-bg border border-james-border rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-bold text-slate-300 px-1">Şifre</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3.5 top-3 w-4 h-4 text-slate-500"></i>
+                        <input type="password" id="auth-password" placeholder="Şifreniz..." required class="w-full bg-james-bg border border-james-border rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400">
+                    </div>
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full py-3.5 px-4 rounded-2xl james-gradient-bg hover:opacity-90 text-white font-bold text-sm flex items-center justify-center space-x-2 transition shadow-lg shadow-sky-500/20">
+                    <span id="auth-btn-text">Giriş Yap</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+
+            <div class="pt-2 border-t border-james-border/60 flex items-center justify-center space-x-1.5 text-xs">
+                <span id="auth-switch-text" class="text-slate-400">Hesabın yok mu?</span>
+                <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-sky-400 font-bold hover:underline">Kayıt Ol</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobil Kenar Çubuğu Karartması -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-30 lg:hidden"></div>
+
+    <!-- SOL KENAR ÇUBUĞU -->
+    <aside id="left-sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-80 bg-james-sidebar border-r border-james-border/80 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out shrink-0">
+        
+        <div class="p-4 border-b border-james-border/70 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-xl james-gradient-bg flex items-center justify-center shadow-lg shadow-sky-500/20">
+                        <!-- Özel NexusAI Logosu -->
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-display font-extrabold text-xl tracking-tight james-gradient-text">NexusAI</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar(false)" class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-james-surface">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <button onclick="createNewChat()" class="w-full py-2.5 px-4 rounded-xl bg-james-surface hover:bg-james-card border border-james-border hover:border-sky-400/50 text-sm font-semibold text-white flex items-center justify-center space-x-2 transition shadow-sm">
+                <i data-lucide="plus" class="w-4 h-4 text-sky-400"></i>
+                <span>Yeni Sohbet Başlat</span>
+            </button>
+        </div>
+
+        <div class="px-4 pt-3">
+            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-james-bg border border-james-border/70">
+                <button onclick="switchSidebarView('chats')" id="side-tab-chats" class="py-1.5 rounded-lg text-xs font-bold bg-james-surface text-white shadow transition flex items-center justify-center space-x-1.5">
+                    <i data-lucide="message-square" class="w-3.5 h-3.5 text-sky-400"></i>
+                    <span>Sohbetler</span>
+                </button>
+                <button onclick="switchSidebarView('reminders')" id="side-tab-reminders" class="py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5 relative">
+                    <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-violet-400"></i>
+                    <span>Hatırlatıcılar</span>
+                    <span id="reminder-count-badge" class="ml-1 px-1.5 py-0.2 rounded-full bg-violet-500/25 text-violet-300 text-[10px] font-extrabold">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="sidebar-view-chats" class="flex-1 overflow-y-auto p-4 space-y-5">
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Uzman Modlar</p>
+                <div id="gems-list" class="space-y-1"></div>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between px-1 mb-2">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Geçmiş Sohbetler</p>
+                    <button onclick="clearAllChats()" class="text-[11px] text-slate-500 hover:text-rose-400 transition">Temizle</button>
+                </div>
+                <div id="chat-history-list" class="space-y-1"></div>
+            </div>
+        </div>
+
+        <div id="sidebar-view-reminders" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
+            <form onsubmit="addManualReminder(event)" class="space-y-2 bg-james-surface p-3 rounded-2xl border border-james-border">
+                <input type="text" id="manual-rem-title" placeholder="Hatırlatıcı başlığı..." required class="w-full bg-james-bg border border-james-border rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-400">
+                <div class="flex gap-2">
+                    <input type="datetime-local" id="manual-rem-time" required class="flex-1 bg-james-bg border border-james-border rounded-xl px-2.5 py-1.5 text-[11px] text-slate-200 focus:outline-none focus:border-violet-400">
+                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition shrink-0">Ekle</button>
+                </div>
+            </form>
+            <div id="reminders-list-container" class="space-y-2"></div>
+        </div>
+
+        <div class="p-3.5 border-t border-james-border/70 bg-james-bg/60 space-y-2.5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                    <div id="sidebar-user-avatar" class="w-8 h-8 rounded-full james-gradient-bg flex items-center justify-center text-xs font-extrabold text-white shrink-0 shadow">N</div>
+                    <div class="min-w-0">
+                        <p id="sidebar-user-name" class="text-xs font-bold text-white truncate">Kullanıcı</p>
+                        <p id="sidebar-user-email" class="text-[10px] text-emerald-400 truncate">Bulut Senkronize</p>
+                    </div>
+                </div>
+                <button onclick="signOutUser()" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-james-surface text-rose-400 hover:bg-rose-500/20 transition">Çıkış</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ANA ALAN -->
+    <main class="flex-1 flex flex-col h-full min-w-0 relative bg-james-bg">
+        <header class="h-16 px-4 sm:px-6 border-b border-james-border/60 bg-james-bg/85 backdrop-blur-md flex items-center justify-between shrink-0 z-20">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button onclick="toggleSidebar(true)" class="lg:hidden p-2 rounded-xl bg-james-surface border border-james-border text-slate-300 hover:text-white">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center space-x-2.5 min-w-0">
+                    <span id="active-gem-badge" class="px-3 py-1.5 rounded-xl bg-james-surface border border-james-border text-xs font-bold text-white flex items-center space-x-2 truncate">
+                        <span id="active-gem-icon">✨</span>
+                        <span id="active-gem-name" class="truncate">NexusAI Pro</span>
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openRemindersDrawer()" class="px-3 py-1.5 rounded-xl bg-james-surface hover:bg-james-card border border-james-border text-xs font-semibold text-violet-300 flex items-center space-x-1.5 transition">
+                    <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Hatırlatıcılar</span>
+                    <span id="header-rem-count" class="px-1.5 py-0.2 rounded-full bg-violet-500/25 text-violet-200 text-[10px] font-bold">0</span>
+                </button>
+                <button onclick="toggleAudioFeedback()" id="audio-toggle-btn" class="p-2 rounded-xl bg-james-surface hover:bg-james-card border border-james-border text-slate-300 hover:text-white transition">
+                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="chat-scroll-container" class="flex-1 overflow-y-auto px-4 sm:px-6 py-6">
+            <div class="max-w-3xl mx-auto">
+                <div id="welcome-screen" class="py-8 sm:py-14 space-y-8">
+                    <div class="text-center space-y-3">
+                        <div class="w-16 h-16 rounded-2xl james-gradient-bg mx-auto flex items-center justify-center aurora-glow mb-4">
+                            <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-white">
+                            Merhaba <span id="welcome-user-name" class="james-gradient-text">Kaşif</span>, ben <span class="james-gradient-text">NexusAI</span>!
+                        </h1>
+                        <p class="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
+                            Bulut veritabanına bağlı olarak tüm cihazlarında seninle olan asistanın. Görsel üretebilir, fotoğraf analiz edebilir ve hatırlatıcılar kurabilirim.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <button onclick="triggerQuickAction('image')" class="p-4 rounded-2xl bg-james-surface/90 hover:bg-james-card border border-james-border hover:border-pink-400/50 text-left transition group space-y-2">
+                            <div class="w-9 h-9 rounded-xl bg-pink-500/15 text-pink-400 flex items-center justify-center group-hover:scale-110 transition">
+                                <i data-lucide="image-plus" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-white">Görsel Oluştur</h3>
+                            <p class="text-xs text-slate-400">"Galata Kulesi üzerinde gün batımı ve martılar, sinematik 8k"</p>
+                        </button>
+                        <button onclick="triggerQuickAction('vision')" class="p-4 rounded-2xl bg-james-surface/90 hover:bg-james-card border border-james-border hover:border-sky-400/50 text-left transition group space-y-2">
+                            <div class="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center group-hover:scale-110 transition">
+                                <i data-lucide="scan-eye" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-white">Fotoğraf Analiz Et</h3>
+                            <p class="text-xs text-slate-400">Bir fotoğraf veya ders sorusu yükle, hayranlıkla inceleyip çözeyim</p>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="messages-list" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 pb-4 pt-2 bg-gradient-to-t from-james-bg via-james-bg to-transparent shrink-0">
+            <div class="max-w-3xl mx-auto">
+                <div id="uploaded-image-preview-bar" class="hidden mb-2.5 p-2.5 rounded-2xl bg-james-surface border border-sky-500/40 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <img id="uploaded-image-thumb" src="" alt="Görsel" class="w-12 h-12 rounded-xl object-cover border border-james-border">
+                        <div>
+                            <p id="uploaded-image-name" class="text-xs font-bold text-white truncate max-w-[200px]">gorsel.jpg</p>
+                            <p class="text-[11px] text-sky-400">Görsel analize hazır</p>
+                        </div>
+                    </div>
+                    <button onclick="clearUploadedImage()" class="p-1.5 rounded-xl bg-james-card hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="rounded-3xl bg-james-surface border border-james-border focus-within:border-sky-400/70 transition shadow-2xl p-2.5">
+                    <textarea id="prompt-textarea" rows="1" placeholder="NexusAI'ye bir şey sor, fotoğraf yükle veya /çiz ile görsel üret..." onkeydown="handleTextareaKeydown(event)" oninput="autoResizeTextarea(this)" class="w-full bg-transparent px-3 py-1.5 text-sm text-white placeholder-slate-400 focus:outline-none resize-none max-h-40"></textarea>
+
+                    <div class="flex items-center justify-between pt-2 px-1 border-t border-james-border/50 mt-1.5">
+                        <div class="flex items-center space-x-1.5">
+                            <input type="file" id="image-file-input" accept="image/*" onchange="handleImageFileSelect(event)" class="hidden">
+                            <button onclick="document.getElementById('image-file-input').click()" class="px-2.5 py-1.5 rounded-xl bg-james-card hover:bg-sky-500/20 text-slate-300 hover:text-sky-300 text-xs font-medium flex items-center space-x-1.5 transition">
+                                <i data-lucide="image" class="w-4 h-4 text-sky-400"></i>
+                                <span class="hidden sm:inline">Fotoğraf</span>
+                            </button>
+                            <button onclick="toggleImageGenMode()" id="image-gen-mode-btn" class="px-2.5 py-1.5 rounded-xl bg-james-card hover:bg-pink-500/20 text-slate-300 hover:text-pink-300 text-xs font-medium flex items-center space-x-1.5 transition">
+                                <i data-lucide="wand-2" class="w-4 h-4 text-pink-400"></i>
+                                <span>Görsel Üret</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="toggleVoiceInput()" id="mic-btn" class="p-2.5 rounded-xl bg-james-card hover:bg-violet-500/20 text-slate-300 hover:text-violet-300 transition">
+                                <i data-lucide="mic" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="handleSendPrompt()" id="send-prompt-btn" class="p-2.5 rounded-xl james-gradient-bg hover:opacity-90 text-white shadow-lg transition flex items-center justify-center">
+                                <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="toast-area" class="fixed top-20 right-4 z-50 flex flex-col items-end space-y-2 pointer-events-none"></div>
+    </main>
+
+    <!-- Firebase SDK Modülleri -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Yapılandırması & Global Bağlantı
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexusai-cloud-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "demo", projectId: "demo" };
+
+        let app, db, auth, currentUserUid = null;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch(e) {}
+
+        window.initFirebaseSync = async function(username) {
+            try {
+                if (auth) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    currentUserUid = auth.currentUser?.uid || username;
+                } else {
+                    currentUserUid = username;
+                }
+                loadUserDataFromCloud();
+            } catch(e) {
+                currentUserUid = username;
+                loadUserDataFromCloud();
+            }
+        };
+
+        window.saveUserDataToCloud = async function() {
+            if (!currentUserUid) return;
+            const payload = {
+                chats: window.nexusState.chats,
+                reminders: window.nexusState.reminders,
+                updatedAt: Date.now()
+            };
+            if (db) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'userdata', 'main');
+                    await setDoc(docRef, payload);
+                } catch(e) {
+                    localStorage.setItem('nexusai_backup_' + currentUserUid, JSON.stringify(payload));
+                }
+            } else {
+                localStorage.setItem('nexusai_backup_' + currentUserUid, JSON.stringify(payload));
+            }
+        };
+
+        async function loadUserDataFromCloud() {
+            if (!currentUserUid) return;
+            let loaded = false;
+            if (db) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'userdata', 'main');
+                    const snap = await getDoc(docRef);
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        window.nexusState.chats = data.chats || [];
+                        window.nexusState.reminders = data.reminders || [];
+                        loaded = true;
+                    }
+                } catch(e) {}
+            }
+            if (!loaded) {
+                const local = localStorage.getItem('nexusai_backup_' + currentUserUid);
+                if (local) {
+                    const parsed = JSON.parse(local);
+                    window.nexusState.chats = parsed.chats || [];
+                    window.nexusState.reminders = parsed.reminders || [];
+                }
+            }
+
+            if (window.nexusState.chats.length === 0) {
+                window.nexusState.chats.push({
+                    id: 'chat_' + Date.now(),
+                    title: 'İlk Keşif Sohbeti',
+                    gemId: 'pro',
+                    messages: [],
+                    updatedAt: Date.now()
+                });
+            }
+            window.nexusState.activeChatId = window.nexusState.chats[0].id;
+            window.afterCloudSyncReady();
+        }
+    </script>
+
+    <script>
+        const CURIOUS_DISCOVERY_DIRECTIVE = `Sen NexusAI'sin. Anlattığın her konuyu sanki ilk defa keşfediyormuş gibi büyülenmiş, şaşkın ve coşkulu bir dille anlat!`;
+
+        const GEMS = [
+            { id: 'pro', name: 'NexusAI Pro (Kaşif)', icon: '✨', system: `Sen NexusAI Pro'sun. ${CURIOUS_DISCOVERY_DIRECTIVE}` },
+            { id: 'studio', name: 'Görsel Atölye', icon: '🎨', system: `Sen Görsel Stüdyo asistanısın. ${CURIOUS_DISCOVERY_DIRECTIVE}` },
+            { id: 'coder', name: 'Kod Kaşifi', icon: '💻', system: `Sen Kod Kaşifisin. ${CURIOUS_DISCOVERY_DIRECTIVE}` },
+            { id: 'tutor', name: 'Ders Koçu', icon: '📚', system: `Sen Ders Koçusun. ${CURIOUS_DISCOVERY_DIRECTIVE}` }
+        ];
+
+        let isRegisterMode = false;
+        window.nexusState = {
+            chats: [],
+            reminders: [],
+            activeChatId: null,
+            activeGemId: 'pro',
+            isImageGenMode: false,
+            uploadedImage: null,
+            isGenerating: false,
+            soundEnabled: true
+        };
+
+        const AuthManager = {
+            currentUser: JSON.parse(localStorage.getItem('nexusai_logged_user_v1') || 'null'),
+            checkAuth() {
+                const gate = document.getElementById('auth-gate-modal');
+                if (this.currentUser) {
+                    gate.classList.add('hidden');
+                    document.getElementById('sidebar-user-name').innerText = this.currentUser.username;
+                    document.getElementById('welcome-user-name').innerText = this.currentUser.username;
+                    if (window.initFirebaseSync) window.initFirebaseSync(this.currentUser.username);
+                } else {
+                    gate.classList.remove('hidden');
+                }
+            }
+        };
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'NexusAI Hesap Oluştur' : 'NexusAI Giriş Yap';
+            document.getElementById('auth-btn-text').innerText = isRegisterMode ? 'Kayıt Ol' : 'Giriş Yap';
+            document.getElementById('auth-switch-text').innerText = isRegisterMode ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
+            document.getElementById('auth-switch-btn').innerText = isRegisterMode ? 'Giriş Yap' : 'Kayıt Ol';
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            if (!username || !password) return;
+
+            let users = JSON.parse(localStorage.getItem('nexusai_users_db_v1') || '{}');
+            if (isRegisterMode) {
+                if (users[username]) { showToast('Bu kullanıcı adı alınmış!'); return; }
+                users[username] = { username, password };
+                localStorage.setItem('nexusai_users_db_v1', JSON.stringify(users));
+            } else {
+                if (!users[username] || users[username].password !== password) { showToast('Hatalı kullanıcı adı veya şifre!'); return; }
+            }
+
+            const userData = { username };
+            localStorage.setItem('nexusai_logged_user_v1', JSON.stringify(userData));
+            AuthManager.currentUser = userData;
+            AuthManager.checkAuth();
+        }
+
+        function signOutUser() {
+            localStorage.removeItem('nexusai_logged_user_v1');
+            AuthManager.currentUser = null;
+            AuthManager.checkAuth();
+            showToast('Oturum kapatıldı.');
+        }
+
+        window.afterCloudSyncReady = function() {
+            renderGemsList();
+            renderChatHistory();
+            renderRemindersList();
+            updateActiveGemUI();
+            renderActiveChat();
+            lucide.createIcons();
+        };
+
+        function saveState() {
+            if (window.saveUserDataToCloud) window.saveUserDataToCloud();
+            updateReminderBadges();
+        }
+
+        function initApp() {
+            AuthManager.checkAuth();
+        }
+
+        function getActiveChat() {
+            return window.nexusState.chats.find(c => c.id === window.nexusState.activeChatId);
+        }
+
+        function toggleSidebar(open) {
+            const sidebar = document.getElementById('left-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (open) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function toggleImageGenMode(forceState = null) {
+            window.nexusState.isImageGenMode = forceState !== null ? forceState : !window.nexusState.isImageGenMode;
+            const btn = document.getElementById('image-gen-mode-btn');
+            const textarea = document.getElementById('prompt-textarea');
+            if (window.nexusState.isImageGenMode) {
+                btn.className = 'px-2.5 py-1.5 rounded-xl bg-pink-500/25 border border-pink-400/50 text-pink-200 text-xs font-bold flex items-center space-x-1.5 transition';
+                textarea.placeholder = '🎨 Oluşturmak istediğin görseli tarif et...';
+            } else {
+                btn.className = 'px-2.5 py-1.5 rounded-xl bg-james-card hover:bg-pink-500/20 text-slate-300 hover:text-pink-300 text-xs font-medium flex items-center space-x-1.5 transition';
+                textarea.placeholder = 'NexusAI\'ye bir şey sor, fotoğraf yükle veya /çiz...';
+            }
+        }
+
+        function switchSidebarView(view) {
+            const chatsView = document.getElementById('sidebar-view-chats');
+            const remView = document.getElementById('sidebar-view-reminders');
+            const tabChats = document.getElementById('side-tab-chats');
+            const tabRem = document.getElementById('side-tab-reminders');
+
+            if (view === 'chats') {
+                chatsView.classList.remove('hidden');
+                remView.classList.add('hidden');
+                tabChats.className = 'py-1.5 rounded-lg text-xs font-bold bg-james-surface text-white shadow transition flex items-center justify-center space-x-1.5';
+                tabRem.className = 'py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5 relative';
+            } else {
+                chatsView.classList.add('hidden');
+                remView.classList.remove('hidden');
+                tabRem.className = 'py-1.5 rounded-lg text-xs font-bold bg-james-surface text-white shadow transition flex items-center justify-center space-x-1.5 relative';
+                tabChats.className = 'py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5';
+                renderRemindersList();
+            }
+        }
+
+        function openRemindersDrawer() {
+            toggleSidebar(true);
+            switchSidebarView('reminders');
+        }
+
+        function renderGemsList() {
+            const container = document.getElementById('gems-list');
+            container.innerHTML = GEMS.map(g => {
+                const active = g.id === window.nexusState.activeGemId;
+                return `
+                    <button onclick="selectGem('${g.id}')" class="w-full px-3 py-2 rounded-xl text-left flex items-center space-x-2.5 transition ${active ? 'bg-james-surface border border-sky-500/40 text-white shadow-sm' : 'text-slate-300 hover:bg-james-surface/60 hover:text-white'}">
+                        <span class="text-base">${g.icon}</span>
+                        <span class="text-xs font-semibold truncate">${g.name}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectGem(gemId) {
+            window.nexusState.activeGemId = gemId;
+            const chat = getActiveChat();
+            if (chat) chat.gemId = gemId;
+            updateActiveGemUI();
+            renderGemsList();
+            saveState();
+            toggleSidebar(false);
+        }
+
+        function updateActiveGemUI() {
+            const gem = GEMS.find(g => g.id === window.nexusState.activeGemId) || GEMS[0];
+            document.getElementById('active-gem-icon').innerText = gem.icon;
+            document.getElementById('active-gem-name').innerText = gem.name;
+        }
+
+        function createNewChat() {
+            const newChat = {
+                id: 'chat_' + Date.now(),
+                title: 'Yeni Keşif Sohbeti',
+                gemId: window.nexusState.activeGemId,
+                messages: [],
+                updatedAt: Date.now()
+            };
+            window.nexusState.chats.unshift(newChat);
+            window.nexusState.activeChatId = newChat.id;
+            saveState();
+            renderChatHistory();
+            renderActiveChat();
+            toggleSidebar(false);
+        }
+
+        function switchChat(chatId) {
+            window.nexusState.activeChatId = chatId;
+            const chat = getActiveChat();
+            if (chat && chat.gemId) {
+                window.nexusState.activeGemId = chat.gemId;
+                updateActiveGemUI();
+                renderGemsList();
+            }
+            renderChatHistory();
+            renderActiveChat();
+            toggleSidebar(false);
+        }
+
+        function deleteChat(e, chatId) {
+            e.stopPropagation();
+            window.nexusState.chats = window.nexusState.chats.filter(c => c.id !== chatId);
+            if (window.nexusState.chats.length === 0) {
+                createNewChat();
+                return;
+            }
+            if (window.nexusState.activeChatId === chatId) {
+                window.nexusState.activeChatId = window.nexusState.chats[0].id;
+            }
+            saveState();
+            renderChatHistory();
+            renderActiveChat();
+        }
+
+        function clearAllChats() {
+            window.nexusState.chats = [];
+            createNewChat();
+            showToast('Tüm sohbetler temizlendi');
+        }
+
+        function renderChatHistory() {
+            const container = document.getElementById('chat-history-list');
+            container.innerHTML = window.nexusState.chats.map(c => {
+                const isActive = c.id === window.nexusState.activeChatId;
+                return `
+                    <div onclick="switchChat('${c.id}')" class="group px-3 py-2 rounded-xl flex items-center justify-between cursor-pointer transition ${isActive ? 'bg-james-card text-white border border-james-border' : 'text-slate-400 hover:bg-james-surface/60 hover:text-slate-200'}">
+                        <div class="flex items-center space-x-2 min-w-0">
+                            <i data-lucide="message-circle" class="w-3.5 h-3.5 shrink-0 ${isActive ? 'text-sky-400' : 'text-slate-500'}"></i>
+                            <span class="text-xs font-medium truncate">${escapeHtml(c.title)}</span>
+                        </div>
+                        <button onclick="deleteChat(event, '${c.id}')" class="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-rose-400 transition">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function handleImageFileSelect(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                window.nexusState.uploadedImage = {
+                    base64: dataUrl.split(',')[1],
+                    mimeType: file.type || 'image/jpeg',
+                    dataUrl,
+                    name: file.name
+                };
+                document.getElementById('uploaded-image-thumb').src = dataUrl;
+                document.getElementById('uploaded-image-name').innerText = file.name;
+                document.getElementById('uploaded-image-preview-bar').classList.remove('hidden');
+                showToast('Fotoğraf eklendi!');
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function clearUploadedImage() {
+            window.nexusState.uploadedImage = null;
+            document.getElementById('uploaded-image-preview-bar').classList.add('hidden');
+        }
+
+        function triggerQuickAction(type) {
+            const ta = document.getElementById('prompt-textarea');
+            if (type === 'image') {
+                toggleImageGenMode(true);
+                ta.value = 'Galata Kulesi üzerinde gün batımı ve uçan martılar';
+                ta.focus();
+            } else if (type === 'vision') {
+                ta.value = 'Bu görseli analiz et.';
+                ta.focus();
+            }
+        }
+
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+        }
+
+        function handleTextareaKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendPrompt();
+            }
+        }
+
+        async function handleSendPrompt() {
+            if (window.nexusState.isGenerating) return;
+            const ta = document.getElementById('prompt-textarea');
+            let text = ta.value.trim();
+            const attachedImage = window.nexusState.uploadedImage ? { ...window.nexusState.uploadedImage } : null;
+            if (!text && !attachedImage) return;
+            if (!text) text = 'Bu fotoğrafı analiz et.';
+
+            const chat = getActiveChat();
+            if (!chat) return;
+
+            if (chat.messages.length === 0) {
+                chat.title = text.slice(0, 34);
+                renderChatHistory();
+            }
+
+            chat.messages.push({
+                id: 'msg_' + Date.now(),
+                role: 'user',
+                text,
+                imageUrl: attachedImage ? attachedImage.dataUrl : null,
+                timestamp: Date.now()
+            });
+
+            ta.value = '';
+            ta.style.height = 'auto';
+            clearUploadedImage();
+            renderActiveChat();
+            scrollToBottom();
+
+            const isDraw = window.nexusState.isImageGenMode || text.toLowerCase().startsWith('/çiz ');
+            const cleanPrompt = text.toLowerCase().startsWith('/çiz ') ? text.slice(5).trim() : text;
+
+            window.nexusState.isGenerating = true;
+            try {
+                if (isDraw && !attachedImage) {
+                    await executeImageGeneration(chat, cleanPrompt);
+                } else {
+                    await executeChatGeneration(chat, text, attachedImage);
+                }
+            } finally {
+                window.nexusState.isGenerating = false;
+                saveState();
+                renderActiveChat();
+                scrollToBottom();
+            }
+        }
+
+        async function executeImageGeneration(chat, prompt) {
+            const loadingId = 'load_' + Date.now();
+            appendThinkingIndicator(loadingId, 'Google Gemini görsel oluşturuyor...');
+            try {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-image:generateContent?key=', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `High detail artwork: ${prompt}` }] }],
+                        generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
+                    })
+                });
+                const result = await response.json();
+                const imgPart = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                removeThinkingIndicator(loadingId);
+                if (imgPart) {
+                    const dataUrl = `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
+                    chat.messages.push({
+                        id: 'msg_' + Date.now(),
+                        role: 'assistant',
+                        text: `Vay canına, **"${prompt}"** fikrini ilk defa tuvale döktüm!`,
+                        generatedImageUrl: dataUrl,
+                        timestamp: Date.now()
+                    });
+                } else {
+                    throw new Error();
+                }
+            } catch(e) {
+                removeThinkingIndicator(loadingId);
+                chat.messages.push({ id: 'msg_' + Date.now(), role: 'assistant', text: 'Görsel üretilirken hata oluştu.', timestamp: Date.now() });
+            }
+        }
+
+        async function executeChatGeneration(chat, text, attachedImage) {
+            const loadingId = 'load_' + Date.now();
+            appendThinkingIndicator(loadingId, 'NexusAI ilk defa keşfediyor...');
+
+            const gem = GEMS.find(g => g.id === window.nexusState.activeGemId) || GEMS[0];
+            const history = chat.messages.slice(-6, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+            const currentParts = [{ text }];
+            if (attachedImage) currentParts.push({ inlineData: { mimeType: attachedImage.mimeType, data: attachedImage.base64 } });
+            history.push({ role: 'user', parts: currentParts });
+
+            try {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: gem.system }] } })
+                });
+                const result = await response.json();
+                const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'Yanıt üretilemedi.';
+                removeThinkingIndicator(loadingId);
+                chat.messages.push({ id: 'msg_' + Date.now(), role: 'assistant', text: reply, timestamp: Date.now() });
+            } catch(e) {
+                removeThinkingIndicator(loadingId);
+                chat.messages.push({ id: 'msg_' + Date.now(), role: 'assistant', text: 'Bağlantı hatası.', timestamp: Date.now() });
+            }
+        }
+
+        function addManualReminder(e) {
+            e.preventDefault();
+            const title = document.getElementById('manual-rem-title').value;
+            const time = document.getElementById('manual-rem-time').value;
+            if (!title || !time) return;
+            window.nexusState.reminders.unshift({ id: 'rem_' + Date.now(), title, dueAt: new Date(time).getTime(), completed: false });
+            document.getElementById('manual-rem-title').value = '';
+            document.getElementById('manual-rem-time').value = '';
+            saveState();
+            renderRemindersList();
+            showToast('Hatırlatıcı eklendi!');
+        }
+
+        function toggleReminderComplete(id) {
+            const rem = window.nexusState.reminders.find(r => r.id === id);
+            if (rem) { rem.completed = !rem.completed; saveState(); renderRemindersList(); }
+        }
+
+        function deleteReminder(id) {
+            window.nexusState.reminders = window.nexusState.reminders.filter(r => r.id !== id);
+            saveState();
+            renderRemindersList();
+        }
+
+        function updateReminderBadges() {
+            const count = window.nexusState.reminders.filter(r => !r.completed).length;
+            document.getElementById('reminder-count-badge').innerText = count;
+            document.getElementById('header-rem-count').innerText = count;
+        }
+
+        function renderRemindersList() {
+            updateReminderBadges();
+            const container = document.getElementById('reminders-list-container');
+            if (window.nexusState.reminders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Hatırlatıcı yok.</p>`;
+                return;
+            }
+            container.innerHTML = window.nexusState.reminders.map(r => `
+                <div class="p-3 rounded-2xl bg-james-surface border border-violet-500/35 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" ${r.completed ? 'checked' : ''} onchange="toggleReminderComplete('${r.id}')" class="cursor-pointer">
+                        <span class="text-xs ${r.completed ? 'line-through text-slate-400' : 'text-white'}">${escapeHtml(r.title)}</span>
+                    </div>
+                    <button onclick="deleteReminder('${r.id}')" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderActiveChat() {
+            const chat = getActiveChat();
+            const welcome = document.getElementById('welcome-screen');
+            const list = document.getElementById('messages-list');
+            if (!chat || chat.messages.length === 0) {
+                welcome.classList.remove('hidden');
+                list.innerHTML = '';
+                return;
+            }
+            welcome.classList.add('hidden');
+            list.innerHTML = chat.messages.map(m => {
+                if (m.role === 'user') {
+                    return `
+                        <div class="flex justify-end">
+                            <div class="max-w-[75%] space-y-2">
+                                ${m.imageUrl ? `<img src="${m.imageUrl}" class="max-h-60 rounded-2xl border border-sky-400/40">` : ''}
+                                <div class="px-4 py-3 rounded-3xl bg-james-card border border-james-border text-sm text-white">${escapeHtml(m.text)}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-xl james-gradient-bg flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+                            <div class="flex-1 space-y-3 text-sm text-slate-200 markdown-body">
+                                ${marked.parse(m.text)}
+                                ${m.generatedImageUrl ? `<div class="rounded-2xl overflow-hidden border border-james-border max-w-lg"><img src="${m.generatedImageUrl}" class="w-full"></div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function appendThinkingIndicator(id, text) {
+            document.getElementById('welcome-screen').classList.add('hidden');
+            const list = document.getElementById('messages-list');
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'flex items-start space-x-3';
+            div.innerHTML = `<div class="w-8 h-8 rounded-xl james-gradient-bg flex items-center justify-center shrink-0"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div><div class="text-xs text-sky-300 font-semibold">${escapeHtml(text)}</div>`;
+            list.appendChild(div);
+            lucide.createIcons();
+            scrollToBottom();
+        }
+
+        function removeThinkingIndicator(id) {
+            document.getElementById(id)?.remove();
+        }
+
+        let recognition = null;
+        function toggleVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'tr-TR';
+            recognition.onresult = (e) => {
+                document.getElementById('prompt-textarea').value += ' ' + e.results[0][0].transcript;
+            };
+            recognition.start();
+        }
+
+        function showToast(msg) {
+            const area = document.getElementById('toast-area');
+            const t = document.createElement('div');
+            t.className = 'px-4 py-2.5 rounded-2xl bg-james-surface border border-sky-400/40 text-xs font-semibold text-white shadow-2xl';
+            t.innerText = msg;
+            area.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function scrollToBottom() {
+            const sc = document.getElementById('chat-scroll-container');
+            sc.scrollTop = sc.scrollHeight;
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
